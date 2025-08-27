@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # FastAPI Application for Production
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=${DATABASE_URL}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - CLOUDINARY_URL=${CLOUDINARY_URL}
+      - CORS_ORIGINS=["https://your-frontend-domain.com"]
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - pixerse-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+networks:
+  pixerse-network:
+    driver: bridge
