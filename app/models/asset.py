@@ -1,8 +1,8 @@
 """
-Asset model for managing Cloudinary files
+Asset model for managing Cloudinary files and YouTube embeds
 """
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, Enum
+from sqlalchemy import Column, Integer, String, Text, DateTime, Enum, BigInteger
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import enum
@@ -11,10 +11,9 @@ from app.database.base import Base
 
 
 class AssetType(enum.Enum):
-    IMAGE = "image"
-    VIDEO = "video"
-    DOCUMENT = "document"
-    OTHER = "other"
+    IMAGE = "IMAGE"
+    VIDEO = "VIDEO"
+    YOUTUBE = "YOUTUBE"
 
 
 class Asset(Base):
@@ -22,15 +21,16 @@ class Asset(Base):
 
     asset_id = Column(Integer, primary_key=True, index=True)
     filename = Column(String(255), nullable=False)
-    original_filename = Column(String(255), nullable=False)
-    cloudinary_public_id = Column(String(255), nullable=False, unique=True, index=True)
-    cloudinary_url = Column(Text, nullable=False)
-    cloudinary_secure_url = Column(Text, nullable=False)
+    original_filename = Column(String(255), nullable=True)  # nullable for YouTube
+    cloudinary_public_id = Column(String(255), nullable=True, unique=True, index=True)  # nullable for YouTube
+    cloudinary_url = Column(Text, nullable=True)  # nullable for YouTube
     asset_type = Column(Enum(AssetType), nullable=False, default=AssetType.IMAGE)
-    file_size = Column(Integer, nullable=True)  # Size in bytes
-    mime_type = Column(String(100), nullable=True)
+    file_size = Column(BigInteger, nullable=True, default=0)  # 0 for YouTube
+    mime_type = Column(String(100), nullable=True)  # nullable for YouTube
     width = Column(Integer, nullable=True)  # For images/videos
     height = Column(Integer, nullable=True)  # For images/videos
+    youtube_video_id = Column(String(100), nullable=True)  # for YouTube videos
+    description = Column(Text, nullable=True)  # alt text or video description
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
